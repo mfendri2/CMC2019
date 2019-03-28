@@ -134,7 +134,10 @@ def exercise1a():
     plt.ylabel('Total muscle force [N]')
     plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
     plt.grid()
-    p,lt.show()
+    plt.show()
+    
+    # 1/c 
+    
 def exercise1d():
     """ Exercise 1d
 
