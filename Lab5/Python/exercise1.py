@@ -44,7 +44,9 @@ def exercise1a():
     muscle = Muscle(parameters)
 
     pylog.warning("Isometric muscle contraction to be completed")
-
+    
+    
+    
     # Instatiate isometric muscle system
     sys = IsometricMuscleSystem()
 
@@ -56,7 +58,7 @@ def exercise1a():
 
     # Evalute for a single muscle stretch
     muscle_stretch = 0.2
-
+    
     # Evalute for a single muscle stimulation
     muscle_stimulation = 1.
 
@@ -78,16 +80,61 @@ def exercise1a():
                            time_step=time_step,
                            stimulation=muscle_stimulation,
                            muscle_length=muscle_stretch)
+    
+    
 
-    # Plotting
-    plt.figure('Isotonic muscle experiment')
-    plt.plot(result.time, result.v_ce)
-    plt.title('Isotonic muscle experiment')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Muscle contractilve velocity')
+    # 
+    muscle_length=np.arange(0,0.35,0.001)
+    F_active=[] 
+    F_passive=[] 
+    F_total=[] 
+    F_length=[]
+    # Exercice 1 a
+    for length in muscle_length:
+        result = sys.integrate(x0=x0,
+                           time=time,
+                           time_step=time_step,
+                           stimulation=muscle_stimulation,
+                           muscle_length=length)
+        F_active.append(result.active_force[-1])
+        F_passive.append(result.passive_force[-1])  
+        F_total.append(result.active_force[-1]+result.passive_force[-1])
+        F_length.append(result.l_ce[-1]) 
+  
+     
+    plt.figure('Isometric muscle experiment')
+   
+    plt.plot(F_length,F_active)
+    plt.plot(F_length,F_passive)
+    plt.plot(F_length,F_total)
+    plt.title('Isometric muscle experiment')
+    plt.xlabel('Length [m]')
+    plt.ylabel('Muscle force [N]')
+    plt.legend(("Active","Passive","Total force"))
+
     plt.grid()
-
-
+    plt.show()
+    # 
+    plt.figure("Isometric muscle experiment by changing the stimulation")
+    different_stimulation=np.arange(0,1,0.2) 
+    for stimulation in different_stimulation:
+        F_total=[] 
+        F_length=[]
+        for length in muscle_length: 
+            result = sys.integrate(x0=x0,
+                           time=time,
+                           time_step=time_step,
+                           stimulation=stimulation,
+                           muscle_length=length)
+            F_total.append(result.active_force[-1]+result.passive_force[-1])
+            F_length.append(result.l_ce[-1]) 
+        plt.plot(F_length,F_total)
+    
+    plt.xlabel('Length [m]')
+    plt.ylabel('Total muscle force [N]')
+    plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
+    plt.grid()
+    p,lt.show()
 def exercise1d():
     """ Exercise 1d
 
@@ -154,9 +201,9 @@ def exercise1d():
                            load=load)
 
     # Plotting
-    plt.figure('Isometric muscle experiment')
+    plt.figure('Isotonic muscle experiment')
     plt.plot(result.time, result.tendon_force)
-    plt.title('Isometric muscle experiment')
+    plt.title('Isotonic muscle experiment')
     plt.xlabel('Time [s]')
     plt.ylabel('Muscle Force')
     plt.grid()
@@ -164,7 +211,7 @@ def exercise1d():
 
 def exercise1():
     exercise1a()
-    exercise1d()
+    #exercise1d()
 
     if DEFAULT["save_figures"] is False:
         plt.show()
