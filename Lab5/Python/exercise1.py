@@ -51,6 +51,7 @@ def exercise1a():
     sys = IsometricMuscleSystem()
 
     # Add the muscle to the system
+    
     sys.add_muscle(muscle)
 
     # You can still access the muscle inside the system by doing
@@ -84,59 +85,88 @@ def exercise1a():
     
 
     # 
-    muscle_length=np.arange(0,0.35,0.001)
-    F_active=[] 
-    F_passive=[] 
-    F_total=[] 
-    F_length=[]
-    # Exercice 1 a
-    for length in muscle_length:
-        result = sys.integrate(x0=x0,
-                           time=time,
-                           time_step=time_step,
-                           stimulation=muscle_stimulation,
-                           muscle_length=length)
-        F_active.append(result.active_force[-1])
-        F_passive.append(result.passive_force[-1])  
-        F_total.append(result.active_force[-1]+result.passive_force[-1])
-        F_length.append(result.l_ce[-1]) 
-  
-     
-    plt.figure('Isometric muscle experiment')
-   
-    plt.plot(F_length,F_active)
-    plt.plot(F_length,F_passive)
-    plt.plot(F_length,F_total)
-    plt.title('Isometric muscle experiment')
-    plt.xlabel('Length [m]')
-    plt.ylabel('Muscle force [N]')
-    plt.legend(("Active","Passive","Total force"))
-
-    plt.grid()
-    plt.show()
-    # 
-    plt.figure("Isometric muscle experiment by changing the stimulation")
-    different_stimulation=np.arange(0,1,0.2) 
-    for stimulation in different_stimulation:
+    muscle_length=np.arange(0,0.4,0.001)
+#    F_active=[] 
+#    F_passive=[] 
+#    F_total=[] 
+#    F_length=[]
+#    # Exercice 1 a
+#    for length in muscle_length:
+#        result = sys.integrate(x0=x0,
+#                           time=time,
+#                           time_step=time_step,
+#                           stimulation=muscle_stimulation,
+#                           muscle_length=length)
+#        F_active.append(result.active_force[-1])
+#        F_passive.append(result.passive_force[-1])  
+#        F_total.append(result.active_force[-1]+result.passive_force[-1])
+#        F_length.append(result.l_ce[-1]) 
+#  
+#     
+#    plt.figure('Isometric muscle experiment')
+#   
+#    plt.plot(F_length,F_active)
+#    plt.plot(F_length,F_passive)
+#    plt.plot(F_length,F_total)
+#    plt.title('Isometric muscle experiment')
+#    plt.xlabel('Length [m]')
+#    plt.ylabel('Muscle force [N]')
+#    plt.legend(("Active","Passive","Total force"))
+#
+#    plt.grid()
+#    plt.show()
+#    # 
+#    plt.figure("Isometric muscle experiment by changing the stimulation")
+#    different_stimulation=np.arange(0,1,0.2) 
+##    for stimulation in different_stimulation:
+#        F_total=[] 
+#        F_length=[]
+#        for length in muscle_length: 
+#            result = sys.integrate(x0=x0,
+#                           time=time,
+#                           time_step=time_step,
+#                           stimulation=stimulation,
+#                           muscle_length=length)
+#            F_total.append(result.active_force[-1]+result.passive_force[-1])
+#            F_length.append(result.l_ce[-1]) 
+#        plt.plot(F_length,F_total)
+#    
+#    plt.xlabel('Length [m]')
+#    plt.ylabel('Total muscle force [N]')
+#    plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
+#    plt.grid()
+#    plt.show()
+    
+    # 1/c 
+    fiber_opt_small=0.07 
+    fiber_opt_medium=0.11
+    fiber_opt_long=0.16 
+    lopt_list=[fiber_opt_small,fiber_opt_medium,fiber_opt_long]
+    muscle_stimulation = 1
+    plt.figure("Isometric muscle experiment changin optimal length")
+    for lopt in lopt_list:
+        print("RUNNING lopt=",lopt)
+        parameters = MuscleParameters(l_opt=lopt)
+        muscle = Muscle(parameters)
+        sys = IsometricMuscleSystem()
+        sys.add_muscle(muscle)
         F_total=[] 
         F_length=[]
         for length in muscle_length: 
             result = sys.integrate(x0=x0,
                            time=time,
                            time_step=time_step,
-                           stimulation=stimulation,
+                           stimulation=muscle_stimulation,
                            muscle_length=length)
             F_total.append(result.active_force[-1]+result.passive_force[-1])
-            F_length.append(result.l_ce[-1]) 
+            F_length.append(result.l_ce[-2]) 
         plt.plot(F_length,F_total)
-    
     plt.xlabel('Length [m]')
     plt.ylabel('Total muscle force [N]')
-    plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
+    plt.legend(("Small l_opt","Medium l_opt","Long l_opt"))       
     plt.grid()
     plt.show()
     
-    # 1/c 
     
 def exercise1d():
     """ Exercise 1d
@@ -196,25 +226,35 @@ def exercise1d():
     time = np.arange(t_start, t_stop, time_step)
 
     # Run the integration
-    result = sys.integrate(x0=x0,
+    load_array=np.arange(0,25,1)
+    vel_ce=[]
+    for load_ in load_array:
+        
+        result = sys.integrate(x0=x0,
                            time=time,
                            time_step=time_step,
                            time_stabilize=time_stabilize,
                            stimulation=muscle_stimulation,
-                           load=load)
-
-    # Plotting
+                           load=load_)
+        
+        if result.l_mtc[-1] > ( muscle_parameters.l_opt + muscle_parameters.l_slack): 
+            
+            vel_ce.append(min(result.v_ce[:]))
+        else: 
+            vel_ce.append(max(result.v_ce[:]))
+                
+    
     plt.figure('Isotonic muscle experiment')
-    plt.plot(result.time, result.tendon_force)
+    plt.plot(vel_ce,load_array*mass_parameters.g)
     plt.title('Isotonic muscle experiment')
-    plt.xlabel('Time [s]')
-    plt.ylabel('Muscle Force')
+    plt.xlabel('Contractile element velocity [m/s]')
+    plt.ylabel('External load applied [N]')
     plt.grid()
 
 
 def exercise1():
-    exercise1a()
-    #exercise1d()
+    #exercise1a()
+    exercise1d()
 
     if DEFAULT["save_figures"] is False:
         plt.show()

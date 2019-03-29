@@ -2,8 +2,7 @@
 
 import numpy as np
 import cmc_pylog as pylog
-
-
+import biolog
 class SystemParameters(object):
     """Parent class providing main attributes for other sub system parameters.
     """
