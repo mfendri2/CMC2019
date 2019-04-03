@@ -86,56 +86,71 @@ def exercise1a():
 
     # 
     muscle_length=np.arange(0,0.4,0.001)
-#    F_active=[] 
-#    F_passive=[] 
-#    F_total=[] 
-#    F_length=[]
-#    # Exercice 1 a
-#    for length in muscle_length:
-#        result = sys.integrate(x0=x0,
-#                           time=time,
-#                           time_step=time_step,
-#                           stimulation=muscle_stimulation,
-#                           muscle_length=length)
-#        F_active.append(result.active_force[-1])
-#        F_passive.append(result.passive_force[-1])  
-#        F_total.append(result.active_force[-1]+result.passive_force[-1])
-#        F_length.append(result.l_ce[-1]) 
-#  
-#     
-#    plt.figure('Isometric muscle experiment')
-#   
-#    plt.plot(F_length,F_active)
-#    plt.plot(F_length,F_passive)
-#    plt.plot(F_length,F_total)
-#    plt.title('Isometric muscle experiment')
-#    plt.xlabel('Length [m]')
-#    plt.ylabel('Muscle force [N]')
-#    plt.legend(("Active","Passive","Total force"))
-#
-#    plt.grid()
-#    plt.show()
-#    # 
-#    plt.figure("Isometric muscle experiment by changing the stimulation")
-#    different_stimulation=np.arange(0,1,0.2) 
-##    for stimulation in different_stimulation:
-#        F_total=[] 
-#        F_length=[]
-#        for length in muscle_length: 
-#            result = sys.integrate(x0=x0,
-#                           time=time,
-#                           time_step=time_step,
-#                           stimulation=stimulation,
-#                           muscle_length=length)
-#            F_total.append(result.active_force[-1]+result.passive_force[-1])
-#            F_length.append(result.l_ce[-1]) 
-#        plt.plot(F_length,F_total)
-#    
-#    plt.xlabel('Length [m]')
-#    plt.ylabel('Total muscle force [N]')
-#    plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
-#    plt.grid()
-#    plt.show()
+    F_active=[] 
+    F_passive=[] 
+    F_total=[] 
+    F_length=[]
+    # Exercice 1 a
+    pylog.info("Ex 1a")
+    for length in muscle_length:
+        result = sys.integrate(x0=x0,
+                           time=time,
+                           time_step=time_step,
+                           stimulation=muscle_stimulation,
+                           muscle_length=length)
+        F_active.append(result.active_force[-1])
+        F_passive.append(result.passive_force[-1])  
+        F_total.append(result.active_force[-1]+result.passive_force[-1])
+        F_length.append(result.l_ce[-1]) 
+        if length==0.2:
+            plt.figure('Single integration experiment')
+            plt.title("Single Integration Experiment for Muscle length = 0.11")
+            plt.plot(result.time,result.active_force)
+            plt.plot(result.time,result.passive_force)
+            plt.xlabel('Time [s]')
+            plt.ylabel('Muscle force [N]')
+            plt.legend(("Active Force","Passive Force"))
+            plt.grid()
+            plt.show()
+  
+     
+    plt.figure("Isometric muscle experiment")
+    plt.title("Isometric Muscle Experiments for Different Lengths")
+    plt.plot(F_length,F_active)
+    plt.plot(F_length,F_passive)
+    plt.plot(F_length,F_total)
+    plt.title('Isometric muscle experiment')
+    plt.xlabel('Contractile Element Length [m]')
+    plt.ylabel('Muscle force [N]')
+    plt.legend(("Active","Passive","Total force"))
+
+    plt.grid()
+    plt.show()
+    pylog.info("Ex 1b")
+    # Exercise 1. b
+    plt.figure("Isometric muscle experiment by changing the stimulation")
+    different_stimulation=np.arange(0,1.2,0.2) 
+#    for stimulation in different_stimulation:
+
+    for stimulation in different_stimulation:
+        F_total=[] 
+        F_length=[]
+        pylog.info("stimulation is {}".format(stimulation))
+        for length in muscle_length: 
+            result = sys.integrate(x0=x0,
+                           time=time,
+                           time_step=time_step,
+                           stimulation=stimulation,
+                           muscle_length=length)
+            F_total.append(result.active_force[-1]+result.passive_force[-1])
+            F_length.append(result.l_ce[-1]) 
+        plt.plot(F_length,F_total)
+    plt.title("Isometric Muscle Experiments with different Stimulation values")
+    plt.xlabel('Length [m]')
+    plt.ylabel('Total muscle force [N]')
+    plt.legend(("stimulation = 0","stimulation = 0.2","stimulation = 0.4","stimulation = 0.6","stimulation = 0.8","stimulation = 1"))       
+    plt.grid()
+    plt.show()
     
     # 1/c 
     fiber_opt_small=0.07 
@@ -143,13 +158,14 @@ def exercise1a():
     fiber_opt_long=0.16 
     lopt_list=[fiber_opt_small,fiber_opt_medium,fiber_opt_long]
     muscle_stimulation = 1
-    plt.figure("Isometric muscle experiment changin optimal length")
     for lopt in lopt_list:
         print("RUNNING lopt=",lopt)
         parameters = MuscleParameters(l_opt=lopt)
         muscle = Muscle(parameters)
         sys = IsometricMuscleSystem()
         sys.add_muscle(muscle)
+        F_active=[] 
+        F_passive=[] 
         F_total=[] 
         F_length=[]
         for length in muscle_length: 
@@ -158,14 +174,20 @@ def exercise1a():
                            time_step=time_step,
                            stimulation=muscle_stimulation,
                            muscle_length=length)
+            F_active.append(result.active_force[-1])
+            F_passive.append(result.passive_force[-1])
             F_total.append(result.active_force[-1]+result.passive_force[-1])
             F_length.append(result.l_ce[-2]) 
+        plt.figure("Isometric muscle experiment with length {}".format(lopt))    
+        plt.plot(F_length,F_active)
+        plt.plot(F_length,F_passive)
         plt.plot(F_length,F_total)
-    plt.xlabel('Length [m]')
-    plt.ylabel('Total muscle force [N]')
-    plt.legend(("Small l_opt","Medium l_opt","Long l_opt"))       
-    plt.grid()
-    plt.show()
+        plt.xlabel('Contractile Element Length [m]')
+        plt.ylabel('Total Muscle Force [N]')
+        plt.title("Isometric muscle experiment with length {}".format(lopt))   
+        plt.legend(("Active","Passive","Total force"))
+        plt.grid()
+        plt.show()
     
     
 def exercise1d():
@@ -189,7 +211,6 @@ def exercise1d():
     # Create mass object
     mass = Mass(mass_parameters)
 
-    pylog.warning("Isotonic muscle contraction to be implemented")
 
     # Instatiate isotonic muscle system
     sys = IsotonicMuscleSystem()
@@ -226,22 +247,31 @@ def exercise1d():
     time = np.arange(t_start, t_stop, time_step)
 
     # Run the integration
-    load_array=np.arange(0,25,1)
+    load_array=np.arange(0.1,500,5)
     vel_ce=[]
-    for load_ in load_array:
+    for loadx in load_array:
         
         result = sys.integrate(x0=x0,
                            time=time,
                            time_step=time_step,
                            time_stabilize=time_stabilize,
                            stimulation=muscle_stimulation,
-                           load=load_)
-        
-        if result.l_mtc[-1] > ( muscle_parameters.l_opt + muscle_parameters.l_slack): 
+                           load=loadx)
+        if loadx==5.1:
+            plt.figure("Single Exp")
+            plt.plot(result.time,result.v_ce)
+            plt.xlabel("time")
+            plt.ylabel("vel")
+            plt.title("mtc={}".format(result.l_mtc[-1]))
+            plt.grid()
+            plt.show()
             
+        if result.l_mtc[-1] < ( muscle_parameters.l_opt + muscle_parameters.l_slack):
+            #pylog.info("min condition")
             vel_ce.append(min(result.v_ce[:]))
         else: 
             vel_ce.append(max(result.v_ce[:]))
+           # pylog.info("max condition")
                 
     
     plt.figure('Isotonic muscle experiment')
@@ -250,6 +280,7 @@ def exercise1d():
     plt.xlabel('Contractile element velocity [m/s]')
     plt.ylabel('External load applied [N]')
     plt.grid()
+    plt.show()
 
 
 def exercise1():
