@@ -33,7 +33,34 @@ plt.rc('xtick', labelsize=14.0)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=14.0)    # fontsize of the tick labels
 
 DEFAULT["save_figures"] = True
+def exercise2a():
+    m1_origin = np.array([-0.17, 0.0])  # Origin of Muscle 1
+    m1_insertion = np.array([0.0, -0.17])  # Insertion of Muscle 1
 
+    m2_origin = np.array([0.17, 0.0])  # Origin of Muscle 2
+    m2_insertion = np.array([0.0, -0.17])  # Insertion of Muscle 2
+
+    a21=-0.10
+    a11=-0.17
+    
+    a22=0.17
+    a12=-0.17
+
+
+
+    theta=np.arange(-np.pi/4,np.pi/4,0.01)
+    length1=np.sqrt(np.power(a21,2)+np.power(a11,2)+2*a11*a21*np.sin(theta))
+    length2=np.sqrt(np.power(a22,2)+np.power(a12,2)+2*a12*a22*np.sin(theta))
+    h1=np.divide(a11*a21*np.cos(theta),length1)
+    h2=np.divide(a12*a22*np.cos(theta),length2)
+    plt.figure("length as funct of theta")
+    plt.plot(theta,length1)
+    plt.plot(theta,length2)
+    plt.show()
+    
+    plt.figure("h as funct of theta")
+    plt.plot(theta,h1)
+    plt.plot(theta,np.abs(h2))
 
 def exercise2():
     """ Main function to run for Exercise 2.

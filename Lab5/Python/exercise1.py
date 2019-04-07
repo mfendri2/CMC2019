@@ -247,8 +247,12 @@ def exercise1d():
     time = np.arange(t_start, t_stop, time_step)
 
     # Run the integration
-    load_array=np.arange(0.1,500,5)
+    load_array=np.arange(0.1,3000/sys.mass.parameters.g,5)
     vel_ce=[]
+    act_force_int=[]
+
+    stimulation=[0.,0.2,0.4,0.6,0.8,1.]
+    colors=['r','g','b','c','m','y']
     for loadx in load_array:
         
         result = sys.integrate(x0=x0,
@@ -257,30 +261,67 @@ def exercise1d():
                            time_stabilize=time_stabilize,
                            stimulation=muscle_stimulation,
                            load=loadx)
-        if loadx==5.1:
+        if (loadx==150.1 or loadx==155.1):
             plt.figure("Single Exp")
-            plt.plot(result.time,result.v_ce)
-            plt.xlabel("time")
-            plt.ylabel("vel")
-            plt.title("mtc={}".format(result.l_mtc[-1]))
+            plt.title("Result for a single experiment")
+            plt.plot(result.time,result.v_ce*(-1))
+            plt.xlabel("Time [s]")
+            plt.ylabel("Velocity [m/s]")
+            plt.legend(('Shortening','Lengthening'))
+            pylog.info(result.l_mtc[-1])
             plt.grid()
             plt.show()
             
         if result.l_mtc[-1] < ( muscle_parameters.l_opt + muscle_parameters.l_slack):
             #pylog.info("min condition")
-            vel_ce.append(min(result.v_ce[:]))
+            vel_ce.append(min(result.v_ce[:])*(-1))
+            act_force_int.append(max(result.active_force))
         else: 
-            vel_ce.append(max(result.v_ce[:]))
+            vel_ce.append(max(result.v_ce[:])*(-1))
+            act_force_int.append(max(result.active_force))
            # pylog.info("max condition")
                 
     
     plt.figure('Isotonic muscle experiment')
     plt.plot(vel_ce,load_array*mass_parameters.g)
-    plt.title('Isotonic muscle experiment')
-    plt.xlabel('Contractile element velocity [m/s]')
-    plt.ylabel('External load applied [N]')
+    plt.plot(vel_ce,act_force_int)
+    plt.title('Isotonic Muscle Experiment')
+    plt.xlabel('Contractile Element Velocity [m/s]')
+    plt.ylabel('Force[N]')
+    plt.legend(("External Load","Internal Active Force"))
     plt.grid()
     plt.show()
+    plt.figure('Varying Stimulation')
+    for i,stim in enumerate(stimulation):
+        pylog.info("Stim is {}".format(stim))
+        vel_ce=[]
+        act_force_int=[]
+        for loadx in load_array:
+            
+            result = sys.integrate(x0=x0,
+                               time=time,
+                               time_step=time_step,
+                               time_stabilize=time_stabilize,
+                               stimulation=stim,
+                               load=loadx)
+                
+            if result.l_mtc[-1] < ( muscle_parameters.l_opt + muscle_parameters.l_slack):
+                #pylog.info("min condition")
+                vel_ce.append(min(result.v_ce[:])*(-1))
+                act_force_int.append(max(result.active_force))
+            else: 
+                vel_ce.append(max(result.v_ce[:])*(-1))
+                act_force_int.append(max(result.active_force))
+        plt.plot(vel_ce,load_array*mass_parameters.g,colors[i],label='Stimulation={}'.format(stim))
+        plt.plot(vel_ce,act_force_int,colors[i],label='Stimulation={}'.format(stim))
+    plt.title('Varying Stimulation')
+    plt.xlabel('Contractile Element Velocity [m/s]')
+    plt.ylabel('Force[N]')
+   # ("Stimulation = 0","Stimulation = 0.2","Stimulation = 0.4","Stimulation = 0.6","Stimulation = 0.8","Stimulation = 1")
+    plt.grid()
+               # pylog.info("max condition"
+   
+
 
 
 def exercise1():
