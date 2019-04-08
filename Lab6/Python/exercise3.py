@@ -102,7 +102,7 @@ def exercise3():
     
     
     ##### Time #####
-    t_max = 2.5  # Maximum simulation time
+    t_max = 3  # Maximum simulation time
     time = np.arange(0., t_max, 0.001)  # Time vector
 
     ##### Model Initial Conditions #####
@@ -123,8 +123,11 @@ def exercise3():
     sim = SystemSimulation(sys)  # Instantiate Simulation object
 
     # Add external inputs to neural network
-
-    # sim.add_external_inputs_to_network(np.ones((len(time), 4)))
+    no_excitation = np.zeros((int(len(time)/3),4))
+    small_exitation=np.ones((int((len(time)/3)),4))*0.3
+    high_excitation=np.ones((int((len(time)/3)),4))*1
+    all_excitation = np.concatenate((no_excitation,small_exitation,high_excitation),axis=0)
+    sim.add_external_inputs_to_network(all_excitation)
     # sim.add_external_inputs_to_network(ext_in)
 
     sim.initalize_system(x0, time)  # Initialize the system state
@@ -150,7 +153,10 @@ def exercise3():
     # Plotting the results
     plt.figure('Pendulum')
     plt.title('Pendulum Phase')
-    plt.plot(res[:, 1], res[:, 2])
+    plt.plot(res[0:int(len(time)/3), 1], res[0:int(len(time)/3), 2])
+    plt.plot(res[int(len(time)/3):2*int(len(time)/3), 1], res[int(len(time)/3):2*int(len(time)/3), 2])
+    plt.plot(res[2*int(len(time)/3):len(time), 1], res[2*int(len(time)/3):len(time), 2])
+    plt.legend(["No external excitation[0]","Small external excitation[0.3]","high external excitation[1]"])
     plt.xlabel('Position [rad]')
     plt.ylabel('Velocity [rad.s]')
     plt.grid()
