@@ -111,7 +111,7 @@ def exercise2c():
     sys.add_muscle_system(muscles)  # Add the muscle model to the system
 
     ##### Model Initial Conditions #####
-    x0_P = np.array([np.pi/6, 0.])  # Pendulum initial condition
+    x0_P = np.array([0, 0.])  # Pendulum initial condition
 
     # Muscle Model initial condition
     x0_M = np.array([0., M1.L_OPT, 0., M2.L_OPT])
@@ -167,12 +167,12 @@ def exercise2c():
     plt.subplot(121)
     plt.loglog(stim_frequency,frequency_pendelum)
     plt.grid()
-    plt.xlabel('Stimulation Frequency in Hz')
+    plt.xlabel('Stimulation Frequency [Hz]')
     plt.ylabel('Pendulum Oscillation Frequency [Hz]')
     plt.subplot(122)
     plt.loglog(stim_frequency,amplitude_pendelum)
     plt.grid()
-    plt.xlabel('Stimulation Frequency in Hz')
+    plt.xlabel('Stimulation Frequency [Hz]')
     plt.ylabel('Pendulum Oscillation Amplitude [rad]')
     plt.savefig('2c.png')
     plt.show()
@@ -213,12 +213,12 @@ def exercise2c():
     plt.subplot(121)
     plt.plot(stim_amplitude,frequency_pendelum)
     plt.grid()
-    plt.xlabel('Stimulation Amplitude')
+    plt.xlabel('Stimulation Amplitude [rad]')
     plt.ylabel('Pendulum Oscillation Frequency [Hz]')
     plt.subplot(122)
     plt.plot(stim_amplitude,amplitude_pendelum)
     plt.grid()
-    plt.xlabel('Stimulation Amplitude')
+    plt.xlabel('Stimulation Amplitude[rad]')
     plt.ylabel('Pendulum Oscillation Amplitude [rad]')
     plt.savefig('2c_amplitude.png')
     plt.show()
@@ -345,7 +345,11 @@ def exercise2():
     plt.xlabel('Position [rad]')
     plt.ylabel('Velocity [rad.s]')
     plt.grid()
-
+    plt.figure('Activations')
+    plt.title('Sine wave activations for both muscles')
+    plt.plot(time,act1)
+    plt.plot(time,act2)
+    plt.legend(("activation muscle1","activation muscle2"))
     # To animate the model, use the SystemAnimation class
     # Pass the res(states) and systems you wish to animate
     simulation = SystemAnimation(res, pendulum, muscles)
