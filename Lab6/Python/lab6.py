@@ -1,6 +1,6 @@
 """ Lab 6 """
 from exercise2 import exercise2
-from exercise2 import exercise2a
+from exercise2 import exercise2a , exercise2c
 from exercise3 import exercise3
 import cmc_pylog as pylog
 
@@ -8,7 +8,8 @@ import cmc_pylog as pylog
 def main():
     """Main function that runs all the exercises."""
     pylog.info('Implementing Lab 6 : Exercise 2a')
-    exercise2a()
+    #exercise2a()
+    exercise2c() 
     #pylog.info('Implementing Lab 6 : Exercise 2')
     #exercise2()
     #pylog.info('Implementing Lab 6 : Exercise 3')

@@ -61,7 +61,161 @@ def exercise2a():
     plt.figure("h as funct of theta")
     plt.plot(theta,h1)
     plt.plot(theta,np.abs(h2))
+    
+def exercise2c():
+    pendulum_params = PendulumParameters()  # Instantiate pendulum parameters
+    pendulum_params.L = 0.5  # To change the default length of the pendulum
+    pendulum_params.m = 1.  # To change the default mass of the pendulum
+    pendulum = PendulumSystem(pendulum_params)  # Instantiate Pendulum object
 
+    #### CHECK OUT PendulumSystem.py to ADD PERTURBATIONS TO THE MODEL #####
+
+    pylog.info('Pendulum model initialized \n {}'.format(
+        pendulum.parameters.showParameters()))
+
+    # Define and Setup your pendulum model here
+    # Check MuscleSytem.py for more details on MuscleSytem class
+    M1_param = MuscleParameters()  # Instantiate Muscle 1 parameters
+    M1_param.f_max = 1500  # To change Muscle 1 max force
+    M2_param = MuscleParameters()  # Instantiate Muscle 2 parameters
+    M2_param.f_max = 1500  # To change Muscle 2 max force
+    M1 = Muscle(M1_param)  # Instantiate Muscle 1 object
+    M2 = Muscle(M2_param)  # Instantiate Muscle 2 object
+    # Use the MuscleSystem Class to define your muscles in the system
+    muscles = MuscleSytem(M1, M2)  # Instantiate Muscle System with two muscles
+    pylog.info('Muscle system initialized \n {} \n {}'.format(
+        M1.parameters.showParameters(),
+        M2.parameters.showParameters()))
+
+    # Define Muscle Attachment points
+    m1_origin = np.array([-0.17, 0.0])  # Origin of Muscle 1
+    m1_insertion = np.array([0.0, -0.17])  # Insertion of Muscle 1
+
+    m2_origin = np.array([0.17, 0.0])  # Origin of Muscle 2
+    m2_insertion = np.array([0.0, -0.17])  # Insertion of Muscle 2
+
+    # Attach the muscles
+    muscles.attach(np.array([m1_origin, m1_insertion]),
+                   np.array([m2_origin, m2_insertion]))
+
+    # Create a system with Pendulum and Muscles using the System Class
+    # Check System.py for more details on System class
+    sys = System()  # Instantiate a new system
+    sys.add_pendulum_system(pendulum)  # Add the pendulum model to the system
+    sys.add_muscle_system(muscles)  # Add the muscle model to the system
+
+    ##### Model Initial Conditions #####
+    x0_P = np.array([np.pi/6, 0.])  # Pendulum initial condition
+
+    # Muscle Model initial condition
+    x0_M = np.array([0., M1.L_OPT, 0., M2.L_OPT])
+
+    x0 = np.concatenate((x0_P, x0_M))  # System initial conditions
+
+    ##### System Simulation #####
+    # For more details on System Simulation check SystemSimulation.py
+    # SystemSimulation is used to initialize the system and integrate
+    # over time
+
+    sim = SystemSimulation(sys)  # Instantiate Simulation object
+    
+    #Frequency effect :
+    
+    stim_frequency = np.array([0.05,0.1,0.5,1,5,10,50,100,500]) #in Hz
+    
+    stim_amplitude = 1 # belongs to 0-1
+    phase = np.pi
+    
+    frequency_pendelum=np.zeros(len(stim_frequency))
+    amplitude_pendelum=np.zeros(len(stim_frequency))
+    for j,frequency in enumerate(stim_frequency):
+        t_max = 5/frequency  # Maximum simulation time
+        time_step = 0.001*(1/frequency)
+        time = np.arange(0., t_max, time_step)  # Time vector
+
+        act1 = np.zeros((len(time),1))
+        act2 = np.zeros((len(time),1))
+        act1[:,0] = stim_amplitude*(1 + np.sin(2*np.pi*frequency*time))/2
+        act2[:,0] = stim_amplitude*(1+ np.sin(2*np.pi*frequency*time + phase))/2
+        activations = np.hstack((act1, act2))
+        sim.add_muscle_activations(activations)
+        sim.initalize_system(x0, time)  # Initialize the system state
+        sim.simulate()
+        res = sim.results()  
+        #computing the freuquency and amplitude
+        angular_position = res[:,1]
+        #signal_stat = signal[index_start:len(signal)]
+        start_index=int(len(angular_position)/2)
+        final_index=(len(angular_position))
+        index_zeros = np.where(np.diff(np.sign(angular_position[start_index:final_index])))[0] #np.where(signal_stat==0)[0]
+        deltas = np.diff(index_zeros)
+        delta = np.mean(deltas)
+       
+        frequency_pendelum[j] = 1/(2*delta*time_step)
+        signal = angular_position[start_index:len(angular_position)]
+        amplitude = (np.max(signal)-np.min(signal))/2
+        amplitude_pendelum[j] = amplitude
+    
+    
+    plt.figure()
+    plt.subplot(121)
+    plt.loglog(stim_frequency,frequency_pendelum)
+    plt.grid()
+    plt.xlabel('Stimulation Frequency in Hz')
+    plt.ylabel('Pendulum Oscillation Frequency [Hz]')
+    plt.subplot(122)
+    plt.loglog(stim_frequency,amplitude_pendelum)
+    plt.grid()
+    plt.xlabel('Stimulation Frequency in Hz')
+    plt.ylabel('Pendulum Oscillation Amplitude [rad]')
+    plt.savefig('2c.png')
+    plt.show()
+    stim_frequency = 10 #in Hz
+    stim_amplitude = np.arange(0,1.1,0.1)
+    frequency_pendelum=np.zeros(len(stim_amplitude))
+    amplitude_pendelum=np.zeros(len(stim_amplitude))
+    
+    for j,amplitude_ in enumerate(stim_amplitude):
+        t_max = 5/stim_frequency  # Maximum simulation time
+        time_step = 0.001*(1/stim_frequency)
+        time = np.arange(0., t_max, time_step)  # Time vector
+    
+        act1 = np.zeros((len(time),1))
+        act2 = np.zeros((len(time),1))
+        act1[:,0] = amplitude_*(1 + np.sin(2*np.pi*stim_frequency*time))/2
+        act2[:,0] = amplitude_*(1+ np.sin(2*np.pi*stim_frequency*time + phase))/2
+        activations = np.hstack((act1, act2))
+        sim.add_muscle_activations(activations)
+        sim.initalize_system(x0, time)  # Initialize the system state
+        sim.simulate()
+        res = sim.results()  
+        #computing the freuquency and amplitude
+        angular_position = res[:,1]
+        #signal_stat = signal[index_start:len(signal)]
+        start_index=int(len(angular_position)/2)
+        final_index=(len(angular_position))
+        index_zeros = np.where(np.diff(np.sign(angular_position[start_index:final_index])))[0] #np.where(signal_stat==0)[0]
+        deltas = np.diff(index_zeros)
+        delta = np.mean(deltas)
+       
+        frequency_pendelum[j] = 1/(2*delta*time_step)
+        signal = angular_position[start_index:len(angular_position)]
+        amplitude = (np.max(signal)-np.min(signal))/2
+        amplitude_pendelum[j] = amplitude
+    frequency_pendelum[0]=0
+    plt.figure()
+    plt.subplot(121)
+    plt.plot(stim_amplitude,frequency_pendelum)
+    plt.grid()
+    plt.xlabel('Stimulation Amplitude')
+    plt.ylabel('Pendulum Oscillation Frequency [Hz]')
+    plt.subplot(122)
+    plt.plot(stim_amplitude,amplitude_pendelum)
+    plt.grid()
+    plt.xlabel('Stimulation Amplitude')
+    plt.ylabel('Pendulum Oscillation Amplitude [rad]')
+    plt.savefig('2c_amplitude.png')
+    plt.show()
 def exercise2():
     """ Main function to run for Exercise 2.
 
