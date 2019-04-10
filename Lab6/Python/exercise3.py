@@ -148,6 +148,15 @@ def exrcise3a():
     plt.xlabel('Time [s]')
     plt.ylabel('Position [rad]')
     plt.grid()
+    plt.figure()
+    leg=[]
+    for i in range(1,5):
+        plt.plot(res[:, 0], res[:, i+6])
+        leg.append('Neuron{}'.format(i))
+    plt.ylabel('Membrane Potential [mV]')
+    plt.xlabel('Time [s]')
+    plt.legend(leg)
+    plt.grid()
     if DEFAULT["save_figures"] is False:
         plt.show()
     else:

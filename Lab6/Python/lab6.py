@@ -11,9 +11,9 @@ def main():
     #exercise2a()
     #exercise2c() 
     #pylog.info('Implementing Lab 6 : Exercise 2')
-    exercise2()
+    #exercise2()
     #pylog.info('Implementing Lab 6 : Exercise 3')
-    #exrcise3a()
+    exrcise3a()
     #exercise3()
     return
 
