@@ -150,13 +150,35 @@ def exrcise3a():
     plt.grid()
     plt.figure()
     leg=[]
+    
+    
+    
+    for i in range(1,5):
+        plt.plot(res[:, 0], 1/(1+np.exp(-res[:, i+6]*N_params.D)))
+        leg.append('Neuron{}'.format(i))
+    plt.title("Activation function")
+    plt.ylabel('x [-]')
+    plt.xlabel('Time [s]')
+    plt.legend(leg)
+    plt.grid()
+    
+    
+    plt.figure("membrane")
+    leg=[]
+    
+    
+    
     for i in range(1,5):
         plt.plot(res[:, 0], res[:, i+6])
         leg.append('Neuron{}'.format(i))
+    plt.title("Membrane Potential")
     plt.ylabel('Membrane Potential [mV]')
     plt.xlabel('Time [s]')
     plt.legend(leg)
     plt.grid()
+    
+    
+    
     if DEFAULT["save_figures"] is False:
         plt.show()
     else:
@@ -307,6 +329,29 @@ def exercise3():
     plt.xlabel('Position [rad]')
     plt.ylabel('Velocity [rad.s]')
     plt.grid()
+    
+    plt.figure()
+    leg=[]
+    for i in range(1,3):
+        plt.plot(res[:, 0], 1/(1+np.exp(-res[:, i+6]*N_params.D)))
+        leg.append('Neuron{}'.format(i))
+    plt.ylabel('x [-]')
+    plt.xlabel('Time [s]')
+    plt.legend(leg)
+    plt.grid()
+    
+    plt.figure()
+    leg=[]
+    for i in range(1,3):
+        plt.plot(res[:, 0],res[:, i+6])
+        leg.append('Neuron{}'.format(i))
+    plt.ylabel('Membrane Potential [mV]')
+    plt.xlabel('Time [s]')
+    plt.legend(leg)
+    plt.grid()
+
+
+
 
     if DEFAULT["save_figures"] is False:
         plt.show()
