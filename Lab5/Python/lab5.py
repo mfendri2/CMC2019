@@ -13,5 +13,6 @@ def main():
 if __name__ == '__main__':
     from cmcpack import parse_args
     parse_args()
-    main()
+    main() 
+
 

@@ -292,6 +292,7 @@ def exercise1d():
     plt.grid()
     plt.show()
     plt.figure('Varying Stimulation')
+    leg=[] 
     for i,stim in enumerate(stimulation):
         pylog.info("Stim is {}".format(stim))
         vel_ce=[]
@@ -313,11 +314,16 @@ def exercise1d():
                 vel_ce.append(max(result.v_ce[:])*(-1))
                 act_force_int.append(max(result.active_force))
         plt.plot(vel_ce,load_array*mass_parameters.g,colors[i],label='Stimulation={}'.format(stim))
-        plt.plot(vel_ce,act_force_int,colors[i],label='Stimulation={}'.format(stim))
+        plt.plot(vel_ce,act_force_int,colors[i],linestyle=":",label='Stimulation={}'.format(stim))
+        leg.append(("Load-velocity  plot with simulation={}".format(stim))) 
+        leg.append(("Force-velocity with simulation={}".format(stim))) 
+
     plt.title('Varying Stimulation')
+    plt.legend(leg)
     plt.xlabel('Contractile Element Velocity [m/s]')
     plt.ylabel('Force[N]')
-   # ("Stimulation = 0","Stimulation = 0.2","Stimulation = 0.4","Stimulation = 0.6","Stimulation = 0.8","Stimulation = 1")
+    
+    #("Stimulation = 0","Stimulation = 0.2","Stimulation = 0.4","Stimulation = 0.6","Stimulation = 0.8","Stimulation = 1")
     plt.grid()
                # pylog.info("max condition"
    
