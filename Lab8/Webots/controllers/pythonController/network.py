@@ -2,18 +2,22 @@
 
 import numpy as np
 import cmc_pylog as pylog
-
+from math import sin
 from solvers import euler, rk4
 
 
 def phases_ode(time, phases, freqs, coupling_weights, phases_desired):
     """Network phases ODE"""
-    return np.zeros_like(phases)
+    phases_dot=np.ones_like(phases)*2*np.pi*freqs
+    for i in range(len(phases)):
+        for j in range(len(phases)):
+            phases_dot[i]+=coupling_weights[i,j]*sin(phases[j]-phases[i]-phases_desired[i,j])    
+    return phases_dot
 
 
 def amplitudes_ode(time, amplitudes, rate, amplitudes_desired):
     """Network amplitudes ODE"""
-    return np.zeros_like(amplitudes)
+    return rate*(amplitudes_desired-amplitudes)
 
 
 def motor_output(phases_left, phases_right, amplitudes_left, amplitudes_right):
