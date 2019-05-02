@@ -7,4 +7,4 @@ centralWidgetVisible: 1
 selectionDisabled: 0
 viewpointLocked: 0
 orthographicViewHeight: 1
-textFiles: 7 "controllers/pythonController/cmc_robot.py" "controllers/pythonController/parse_args.py" "controllers/pythonController/plot_results.py" "controllers/pythonController/pythonController.py" "controllers/pythonController/run_network.py" "controllers/pythonController/save_figures.py" "controllers/pythonController/solvers.py" "controllers/pythonController/network.py"
+textFiles: 8 "../../Lab8/Webots/controllers/pythonController/cmc_robot.py" "../../Lab8/Webots/controllers/pythonController/parse_args.py" "../../Lab8/Webots/controllers/pythonController/plot_results.py" "../../Lab8/Webots/controllers/pythonController/pythonController.py" "../../Lab8/Webots/controllers/pythonController/run_network.py" "../../Lab8/Webots/controllers/pythonController/save_figures.py" "../../Lab8/Webots/controllers/pythonController/solvers.py" "../../Lab8/Webots/controllers/pythonController/network.py" "controllers/pythonController/exercise_example.py"
