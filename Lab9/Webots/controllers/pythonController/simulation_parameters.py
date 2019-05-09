@@ -14,9 +14,10 @@ class SimulationParameters(dict):
         self.n_legs_joints = 4
         self.simulation_duration = 30
         self.phase_lag = None
-        self.amplitude_gradient = None
+        self.amplitude_gradient = [1,1]
+        self.drive=0
         # Feel free to add more parameters (ex: MLR drive)
-        # self.drive_mlr = ...
+        #self.drive_mlr = ...
         # ...
         # Update object with provided keyword arguments
         self.update(kwargs)  # NOTE: This overrides the previous declarations

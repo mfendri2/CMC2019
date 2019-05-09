@@ -28,10 +28,11 @@ def network_ode(_time, state, parameters):
 
 def motor_output(phases, amplitudes):
     """Motor output"""
-    
-    
-    
-    return np.zeros_like(phases) + np.zeros_like(amplitudes)
+    q=np.zeros((14)) #Magic number
+    for i in range(10):
+        q[i]=amplitudes[i]*(1+math.cos(phases[i]))-amplitudes[i+10]*(1+math.cos(phases[i+10]))
+    q[10:-1]=-phases[20:-1]
+    return q
 
 
 class ODESolver(object):
