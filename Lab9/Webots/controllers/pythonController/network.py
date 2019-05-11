@@ -18,11 +18,10 @@ def network_ode(_time, state, parameters):
     
     sum_term=np.zeros_like(phases)
     for i in range(parameters.n_oscillators):
-        sum_term[i]= sum(amplitudes*parameters.coupling_weights[i][:]*np.sin(phases-phases[i]-parameters.phase_bias[i][:]))
+        sum_term[i]= np.sum(amplitudes*parameters.coupling_weights[i][:]*np.sin(phases-phases[i]-parameters.phase_bias[i][:]))
     phases_dot=2*math.pi*parameters.freqs+sum_term
     
     amplitudes_dot=parameters.rates*(parameters.nominal_amplitudes-amplitudes)
-    
     return np.concatenate([phases_dot, amplitudes_dot])
 
 
@@ -31,7 +30,11 @@ def motor_output(phases, amplitudes):
     q=np.zeros((14)) #Magic number
     for i in range(10):
         q[i]=amplitudes[i]*(1+math.cos(phases[i]))-amplitudes[i+10]*(1+math.cos(phases[i+10]))
-    q[10:-1]=-phases[20:-1]
+    q[10:14]=-phases[20:24]
+    for i in range(4):
+        if amplitudes[i+20]==0:
+            q[10+i]=0
+            
     return q
 
 

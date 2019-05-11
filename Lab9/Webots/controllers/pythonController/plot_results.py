@@ -7,16 +7,26 @@ from matplotlib.colors import LogNorm
 from cmc_robot import ExperimentLogger
 from save_figures import save_figures
 from parse_args import save_plots
+import math
 
-
-def plot_positions(times, link_data):
+def plot_positions(times, link_data,labels,d):
     """Plot positions"""
     for i, data in enumerate(link_data.T):
-        plt.plot(times, data, label=["x", "y", "z"][i])
+        plt.plot(times, data,label=labels[i])
     plt.legend()
     plt.xlabel("Time [s]")
-    plt.ylabel("Distance [m]")
+    plt.ylabel("Joint Angle [rad]")
+    plt.title("Joint angles for drive= {}".format(d))
     plt.grid(True)
+    
+def plot_pos_xyz(times, link_data):
+    """Plot positions"""
+    for i, data in enumerate(link_data.T):
+        plt.plot(times, data,label=["x","y","z"][i])
+    plt.legend()
+    plt.xlabel("Time [s]")
+    plt.ylabel("Position")
+    plt.grid(True)    
 
 
 def plot_trajectory(link_data):
@@ -72,22 +82,69 @@ def plot_2d(results, labels, n_data=300, log=False, cmap=None):
     cbar = plt.colorbar()
     cbar.set_label(labels[2])
 
-
+    
 def main(plot=True):
     """Main"""
     # Load data
-    with np.load('logs/example/simulation_0.npz') as data:
-        timestep = float(data["timestep"])
-        amplitude = data["amplitudes"]
-        phase_lag = data["phase_lag"]
-        link_data = data["links"][:, 0, :]
-        joints_data = data["joints"]
-    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+    phase_lag=np.linspace(0,4*math.pi,15)
+    amplitude = np.linspace(0.3,0.5,15)
+    num_simulation=len(phase_lag)*len(amplitude)
+    vx=np.zeros(num_simulation)
+    energy=np.zeros_like(vx)
+    for i in range(num_simulation):
+        with np.load('logs/example/simulation_{}.npz'.format(i)) as data:
+            timestep = float(data["timestep"])
+#            amplitude = data["amplitude"]
+#            phase_lag = data["phase_lag"]
+            link_data = data["links"][:, 0, :]
+            joints_data = data["joints"]
+        times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+        x=link_data[1000:,0]
+        y=link_data[1000:,1]
+        z=link_data[1000:,2] 
+        vx_v=np.diff(x)/np.diff(times[1000:])
+        vy_v=np.diff(y)/np.diff(times[1000:])
+        vz_v=np.diff(z)/np.diff(times[1000:])
+        vx[i]=np.mean(vx_v)
+        vy=np.mean(vy_v)
+        vz=np.mean(vz_v)
+        
+        power=np.abs(joints_data[:,:,2]*joints_data[:,:,4])
+        energy[i]=np.sum(np.trapz(power,times,axis=0))
+        
+#        plt.figure("speed sim {}".format(i))
+#        plt.plot(times[1000:-1],vx_v,label="Vx")
+#        plt.plot(times[1000:-1],vy_v,label="Vy")
+#        plt.plot(times[1000:-1],vz_v,label="Vz")
+#        plt.legend()
+    print(vx)
+    print(energy)
+    solution=np.zeros((num_simulation,3))
+    for i in range(len(phase_lag)):
+        for j in range(len(amplitude)): 
+            solution[i*j,0]=phase_lag[i]
+            solution[i*j,1]=amplitude[j]
+    solution[:,2]=vx
+    plt.figure("grid speed ")
+    plot_2d(solution, ["Phase_lag","Amplitude","speed"], n_data=num_simulation, log=False)
+    
+    solution[:,2]=energy
+    plt.figure("grid energy ")
+    plot_2d(solution, ["Phase_lag","Amplitude","energy"], n_data=num_simulation, log=False) 
+    
+    solution[:,2]=vx/energy
+    plt.figure("grid speed/energy ")
+    plot_2d(solution, ["Phase_lag","Amplitude","speed/speed"], n_data=num_simulation, log=False)  
+    """
+    print(np.shape(amplitude))
+    print(np.shape(phase_lag))
+    print(np.shape(link_data))
+    print(np.shape(joints_data))
 
     # Plot data
     plt.figure("Positions")
-    plot_positions(times, link_data)
-
+    plot_pos_xyz(times, link_data)
+    """
     # Show plots
     if plot:
         plt.show()

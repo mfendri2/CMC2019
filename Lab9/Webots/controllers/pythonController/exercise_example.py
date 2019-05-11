@@ -4,7 +4,6 @@ import numpy as np
 from run_simulation import run_simulation
 from simulation_parameters import SimulationParameters
 
-
 def exercise_example(world, timestep, reset):
     """Exercise example"""
     # Parameters
@@ -18,7 +17,7 @@ def exercise_example(world, timestep, reset):
             turn=0,
             # ...
         )
-        for drive in np.linspace(1, 2, 2)
+        for drive in np.linspace(1, 5, 5)
         # for amplitudes in ...
         # for ...
     ]

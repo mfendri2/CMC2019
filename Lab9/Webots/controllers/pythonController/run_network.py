@@ -8,9 +8,9 @@ from network import SalamanderNetwork
 from save_figures import save_figures
 from parse_args import save_plots
 from simulation_parameters import SimulationParameters
+from plot_results import plot_positions
 
-
-def run_network(duration, update=False, drive=0):
+def run_network(duration, update=False, drive=4):
     """Run network without Webots and plot results"""
     # Simulation setup
     timestep = 5e-3
@@ -19,7 +19,6 @@ def run_network(duration, update=False, drive=0):
     parameters = SimulationParameters(
         drive=drive,
         amplitude_gradient=None,
-        phase_lag=None,
         turn=None,
     )
     network = SalamanderNetwork(timestep, parameters)
@@ -73,7 +72,8 @@ def run_network(duration, update=False, drive=0):
     ))
 
     # Implement plots of network results
-    pylog.warning("Implement plots")
+    print(np.shape(outputs_log),n_iterations)
+    plot_positions(times,outputs_log[:,0:10],["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10"],drive)
 
 
 def main(plot):

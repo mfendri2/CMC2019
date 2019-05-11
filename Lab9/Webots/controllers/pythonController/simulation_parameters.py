@@ -1,5 +1,5 @@
 """Simulation parameters"""
-
+import math
 
 class SimulationParameters(dict):
     """Simulation parameters"""
@@ -13,9 +13,11 @@ class SimulationParameters(dict):
         self.n_body_joints = 10
         self.n_legs_joints = 4
         self.simulation_duration = 30
-        self.phase_lag = None
+        self.phase_lag = 2*math.pi
         self.amplitude_gradient = [1,1]
-        self.drive=0
+        self.drive=4
+        self.flag="example"
+        self.back=False
         # Feel free to add more parameters (ex: MLR drive)
         #self.drive_mlr = ...
         # ...
