@@ -17,8 +17,8 @@ def exercise_9c(world, timestep, reset):
             amplitude_gradient=[a_head,a_tail]
             # ...
         )
-        for a_head in np.linspace(0.3,0.5,5)
-        for a_tail in np.linspace(0.3,0.5,5)
+        for a_head in np.linspace(0.3,0.5,10)
+        for a_tail in np.linspace(0.3,0.5,10)
         # for amplitudes in ...
         # for ...
     ]
@@ -31,5 +31,5 @@ def exercise_9c(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/9c/simulation_{}.npz".format(simulation_i)
         )

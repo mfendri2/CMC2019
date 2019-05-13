@@ -12,11 +12,10 @@ def exercise_9d1(world, timestep, reset):
         SimulationParameters(
             simulation_duration=10,
             drive=4,
-            turn=turn,
+            turn=0.7,
             flag="9d1",
             # ...
         )
-        for turn in [-0.1,0.1]
         # for amplitudes in ...
         # for ...
     ]
@@ -29,7 +28,7 @@ def exercise_9d1(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/9d1/simulation_{}.npz".format(simulation_i)
         )
 
 def exercise_9d2(world, timestep, reset):
@@ -56,5 +55,5 @@ def exercise_9d2(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/9d2/simulation_{}.npz".format(simulation_i)
         )

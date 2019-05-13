@@ -88,11 +88,21 @@ def main(plot=True):
     # Load data
     phase_lag=np.linspace(0,4*math.pi,15)
     amplitude = np.linspace(0.3,0.5,15)
-    num_simulation=len(phase_lag)*len(amplitude)
+    a_head=np.linspace(0.3,0.5,10)
+    a_tail=np.linspace(0.3,0.5,10)
+    body_legs=np.linspace(0,math.pi*2,50)
+    amps=np.linspace(0,0.6,50)
+    num_simulation_9b=len(phase_lag)*len(amplitude)
+    num_simulation_9c=len(a_head)*len(a_tail)
+    num_simulation_9f=len(body_legs)
+    num_simulation=len(amps)
     vx=np.zeros(num_simulation)
     energy=np.zeros_like(vx)
+    meanv=np.zeros_like(vx)
+    
+    
     for i in range(num_simulation):
-        with np.load('logs/example/simulation_{}.npz'.format(i)) as data:
+        with np.load('../../../9f2/simulation_{}.npz'.format(i)) as data:
             timestep = float(data["timestep"])
 #            amplitude = data["amplitude"]
 #            phase_lag = data["phase_lag"]
@@ -108,33 +118,57 @@ def main(plot=True):
         vx[i]=np.mean(vx_v)
         vy=np.mean(vy_v)
         vz=np.mean(vz_v)
+        meanv[i]=(vx[i]+vy+vz)/3
         
-        power=np.abs(joints_data[:,:,2]*joints_data[:,:,4])
+
+        
+        power=np.abs(joints_data[:,:,1]*joints_data[:,:,3])
         energy[i]=np.sum(np.trapz(power,times,axis=0))
-        
+        if i==200 :
+            plt.figure("Position evolution for swimming")
+            plot_pos_xyz(times,link_data)
+            plt.xlabel("Time [s]")
+            plt.ylabel("Position [m]")
+            plt.legend(["X","Y","Z"])
+            plt.title("Position evolution for swimming")
 #        plt.figure("speed sim {}".format(i))
 #        plt.plot(times[1000:-1],vx_v,label="Vx")
 #        plt.plot(times[1000:-1],vy_v,label="Vy")
 #        plt.plot(times[1000:-1],vz_v,label="Vz")
 #        plt.legend()
-    print(vx)
-    print(energy)
+#    print(vx)
+#    print(energy)
+
+    plt.figure("Influence of joint amplitude on speed")
+    plt.scatter(amps,meanv)
+    plt.plot(amps[29],meanv[29],"ro")
+    plt.xlabel("Joint Amplitudes [rad]")
+    plt.ylabel("Speed [m/s]")
+    plt.title("Influence of joint amplitude on speed")
+    """ PLotting of the 2D grid_searches
+    
     solution=np.zeros((num_simulation,3))
+    c=0
     for i in range(len(phase_lag)):
-        for j in range(len(amplitude)): 
-            solution[i*j,0]=phase_lag[i]
-            solution[i*j,1]=amplitude[j]
+        for j in range(len(amplitude)):
+            solution[c,0]=phase_lag[i]
+            solution[c,1]=amplitude[j]
+            c=c+1
     solution[:,2]=vx
     plt.figure("grid speed ")
-    plot_2d(solution, ["Phase_lag","Amplitude","speed"], n_data=num_simulation, log=False)
+    plot_2d(solution[90:,:], ["Phase Lag","Amplitude","Speed"], n_data=num_simulation-90, log=False)
+    plt.title("Grid Search for Speed")
     
     solution[:,2]=energy
     plt.figure("grid energy ")
-    plot_2d(solution, ["Phase_lag","Amplitude","energy"], n_data=num_simulation, log=False) 
+    plot_2d(solution[90:,:], ["Phase Lag","Amplitude","Energy"], n_data=num_simulation-90, log=False) 
+    plt.title("Grid Search for Energy")
     
     solution[:,2]=vx/energy
     plt.figure("grid speed/energy ")
-    plot_2d(solution, ["Phase_lag","Amplitude","speed/speed"], n_data=num_simulation, log=False)  
+    plot_2d(solution[90:,:], ["Phase Lag","Amplitude","Speed/Energy"], n_data=num_simulation-90, log=False)  
+    plt.title("Grid Search for Speed/Energy")
+    """
     """
     print(np.shape(amplitude))
     print(np.shape(phase_lag))
@@ -145,6 +179,25 @@ def main(plot=True):
     plt.figure("Positions")
     plot_pos_xyz(times, link_data)
     """
+    
+    with np.load('../../../9f/simulation_{}.npz'.format(0)) as data:
+        timestep = float(data["timestep"])
+    #            amplitude = data["amplitude"]
+    #            phase_lag = data["phase_lag"]
+        link_data = data["links"][:, 0, :]
+        joints_data = data["joints"]
+    times = np.arange(0, timestep*np.shape(link_data)[0], timestep)
+    plt.figure()
+    link_data[:,0]=link_data[:,0]+10
+    plot_pos_xyz(times,link_data)
+    plt.title("XYZ positions for walking motion")
+    plt.figure()
+    plot_trajectory(link_data)
+    plt.title("2D Trajectory for walking motion")
+    plt.figure()
+    plot_positions(times,joints_data[:,:,0],["q1","q2","q3","q4","q5","q6","q7","q8","q9","q10"],4)
+    plt.title("Joint Angles for walking motion")
+    
     # Show plots
     if plot:
         plt.show()

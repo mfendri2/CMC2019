@@ -3,6 +3,7 @@
 import numpy as np
 from run_simulation import run_simulation
 from simulation_parameters import SimulationParameters
+import math
 
 def exercise_example(world, timestep, reset):
     """Exercise example"""
@@ -11,13 +12,13 @@ def exercise_example(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
-            drive=drive,
-            amplitudes=[1, 2, 3],
-            phase_lag=np.zeros(n_joints),
+            drive=4,
+            #amplitudes=[1, 2, 3],
+            phase_lag=2*math.pi,
             turn=0,
             # ...
         )
-        for drive in np.linspace(1, 5, 5)
+        #for drive in np.linspace(1, 5, 5)
         # for amplitudes in ...
         # for ...
     ]

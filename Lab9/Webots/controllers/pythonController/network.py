@@ -22,6 +22,14 @@ def network_ode(_time, state, parameters):
     phases_dot=2*math.pi*parameters.freqs+sum_term
     
     amplitudes_dot=parameters.rates*(parameters.nominal_amplitudes-amplitudes)
+   
+    if abs(_time-4)<=0.0001  and parameters.flag == "9d1":
+        print("turn on")
+        parameters.turn(True)
+    if abs(_time-6)<=0.0001 and parameters.flag=="9d1":
+        parameters.turn(False)
+        print("turn off")
+    
     return np.concatenate([phases_dot, amplitudes_dot])
 
 
@@ -33,8 +41,7 @@ def motor_output(phases, amplitudes):
     q[10:14]=-phases[20:24]
     for i in range(4):
         if amplitudes[i+20]==0:
-            q[10+i]=0
-            
+            q[10+i]=0  
     return q
 
 
