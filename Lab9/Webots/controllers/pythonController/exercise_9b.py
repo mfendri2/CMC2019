@@ -18,8 +18,8 @@ def exercise_9b(world, timestep, reset):
             flag="9b"
             # ...
         )
-        for phase_lag in np.linspace(0,4*math.pi,5)
-        for amplitude in np.linspace(0.3,0.5,5)
+        for phase_lag in np.linspace(math.pi*3/2,4*math.pi,10)
+        for amplitude in np.linspace(0.3,0.5,10)
         # for amplitudes in ...
         # for ...
     ]
@@ -32,6 +32,6 @@ def exercise_9b(world, timestep, reset):
             parameters,
             timestep,
             int(1000*parameters.simulation_duration/timestep),
-            logs="./logs/example/simulation_{}.npz".format(simulation_i)
+            logs="./logs/9b/simulation_{}.npz".format(simulation_i)
         )
 

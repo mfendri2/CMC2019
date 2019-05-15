@@ -10,7 +10,7 @@ def exercise_9d1(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=10,
+            simulation_duration=20,
             drive=4,
             turn=0.7,
             flag="9d1",
@@ -36,7 +36,7 @@ def exercise_9d2(world, timestep, reset):
     n_joints = 10
     parameter_set = [
         SimulationParameters(
-            simulation_duration=10,
+            simulation_duration=20,
             drive=4,
             turn=0,
             flag="9d2",

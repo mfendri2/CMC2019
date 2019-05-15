@@ -29,43 +29,39 @@ class RobotParameters(dict):
         self.phase_bias = np.zeros([self.n_oscillators, self.n_oscillators])
         self.rates = np.zeros(self.n_oscillators)
         self.nominal_amplitudes = np.zeros(self.n_oscillators)
-        self.d=parameters.drive
-        self.amplitude=parameters.amplitude
-        self.amplitude_gradient=parameters.amplitude_gradient
-        self.flag=parameters.flag
-        self.turning=parameters.turn
+        #self.turning=parameters.turn
         self.update(parameters)
 
 
     def update(self, parameters):
         """Update network from parameters"""
-        self.set_frequencies()  # f_i
+        self.set_frequencies(parameters)  # f_i
         self.set_coupling_weights(parameters)  # w_ij
         self.set_phase_bias(parameters)  # theta_i
         self.set_amplitudes_rate(parameters)  # a_i
-        self.set_nominal_amplitudes()  # R_i
+        self.set_nominal_amplitudes(parameters)  # R_i
         
         
-    def turn(self,value):
-        print(turning)
-        if value:
-            self.flag="9d1g"
-            self.d=self.d-self.turning
-            self.set_frequencies()
-            self.set_nominal_amplitudes()
-            self.flag="9d1"
-        else:
-            self.flag="9d1s"
-            self.d=self.d+self.turning
-            self.set_frequencies()
-            self.set_nominal_amplitudes()
-            self.flag="9d1"
+#    def turn(self,value):
+#        print(turning)
+#        if value:
+#            self.flag="9d1g"
+#            self.d=self.d-self.turning
+#            self.set_frequencies()
+#            self.set_nominal_amplitudes()
+#            self.flag="9d1"
+#        else:
+#            self.flag="9d1s"
+#            self.d=self.d+self.turning
+#            self.set_frequencies()
+#            self.set_nominal_amplitudes()
+#            self.flag="9d1"
 
             
             
 
-    def set_frequencies(self):
-        d=self.d
+    def set_frequencies(self,parameters):
+        d=parameters.drive
         f_b=(0.2*d+0.3)
         f_l=(0.0+0.2*d)
         if d<1:
@@ -79,31 +75,24 @@ class RobotParameters(dict):
         self.freqs[0:self.n_oscillators_body]=f_b
         self.freqs[self.n_oscillators_body:self.n_oscillators]=f_l
         
-        if self.flag=="9d1g":
-            d1=d+2*self.turning
-            f_b1=(0.2*d1+0.3)
-            f_l1=(0.0+0.2*d1)
+        if parameters.turn !=0 and parameters.turning:
+            d1=parameters.drive+parameters.turn
+            d2=parameters.drive-parameters.turn
+            f_b_1=(0.196+0.065*d1)
+            f_b_2=(0.196+0.065*d2)
             if d1<1:
-                f_l1=0
-                f_b1=0
-            if d1>3:
-                f_l1=0
+                f_b_1=0
             if d1>5:
-                f_b1=0
-            self.freqs[self.n_oscillators_body//2:self.n_oscillators_body]=f_b1
-       
-        if self.flag=="9d1s":
-            d1=d
-            f_b1=(0.2*d1+0.3)
-            f_l1=(0.0+0.2*d1)
-            if d1<1:
-                f_l1=0
-                f_b1=0
-            if d1>3:
-                f_l1=0
-            if d1>5:
-                f_b1=0
-            self.freqs[self.n_oscillators_body//2:self.n_oscillators_body]=f_b1
+                f_b_1=0
+            if d2<1:
+                f_b_2=0
+            if d2>5:
+                f_b_2=0      
+            print(f_b_1,f_b_2,parameters.turn)
+            self.freqs=np.ones(self.n_oscillators) 
+            self.freqs[0:self.n_oscillators_body//2]=f_b_1
+            self.freqs[self.n_oscillators_body//2:self.n_oscillators_body]=f_b_2
+            self.freqs[self.n_oscillators_body:self.n_oscillators]=f_l
 
     def set_coupling_weights(self, parameters):
         """Set coupling weights"""
@@ -133,8 +122,6 @@ class RobotParameters(dict):
         largediag=np.diag(np.ones(self.n_oscillators_body-1)*parameters.phase_lag/10)
         largediag[int(self.n_oscillators_body/2-1)][int(self.n_oscillators_body/2-1)]=0
         
-        
-        
         #Setting up the phases biases between limb and body oscillators. 
         num_assigned=self.n_oscillators_body//self.n_oscillators_legs
         phases=np.ones(num_assigned)*parameters.leg_body
@@ -155,31 +142,27 @@ class RobotParameters(dict):
                     self.phase_bias[self.n_oscillators_body+i,(i+1)*num_assigned:(i+1)*(num_assigned)+num_assigned]+=phases
                     self.phase_bias[(i+1)*num_assigned:(i+1)*(num_assigned)+num_assigned,self.n_oscillators_body+i]+=phases.T
 
-                
-            #self.phase_bias[self.n_oscillators_body+i,i*self.n_oscillators_legs:i*self.n_oscillators_legs+num_assigned]+=phases
         
-        print("edited")
         if parameters.back== False:
             self.phase_bias[1:largediag.shape[0]+1,0:largediag.shape[1]]+=largediag;
             self.phase_bias[0:largediag.shape[1],1:largediag.shape[0]+1]-=largediag;
-        np.savetxt("test.csv", self.phase_bias,delimiter=",")
+
         
         if parameters.back==True:
             self.phase_bias[1:largediag.shape[0]+1,0:largediag.shape[1]]-=largediag;
             self.phase_bias[0:largediag.shape[1],1:largediag.shape[0]+1]+=largediag;
-
+        np.savetxt("test_phase.csv", self.phase_bias,delimiter=",")
     def set_amplitudes_rate(self, parameters):
         """Set amplitude rates"""
         self.rates+=20
         print(np.shape(self.rates))
         
 
-    def set_nominal_amplitudes(self):
+    def set_nominal_amplitudes(self,parameters):
         """Set nominal amplitudes"""
-        d=self.d
+        d=parameters.drive
         R_b=(0.196+0.065*d)
         R_l=(0.131+0.131*d)
-        print(R_b,R_l)
         
         if d<1:
             R_l=0
@@ -188,42 +171,33 @@ class RobotParameters(dict):
             R_l=0
         if d>5:
             R_b=0
-        if self.flag=="9b" or self.flag=="9f2":
-            R_b=self.amplitude
+        if parameters.flag=="9b" or parameters.flag=="9f2":
+            R_b=parameters.amplitude
             
         self.nominal_amplitudes=np.ones(self.n_oscillators) 
         self.nominal_amplitudes[0:self.n_oscillators_body]=R_b
         self.nominal_amplitudes[self.n_oscillators_body:self.n_oscillators]=R_l
-        print(self.nominal_amplitudes)
+        print(self.nominal_amplitudes[20])
         
-        if self.flag=="9c":
-            self.nominal_amplitudes[0:int(self.n_oscillators_body/2)]=np.linspace(self.amplitude_gradient[0],self.amplitude_gradient[1],int(self.n_oscillators_body/2))
+        if parameters.flag=="9c":
+            self.nominal_amplitudes[0:int(self.n_oscillators_body/2)]=np.linspace(parameters.amplitude_gradient[0],parameters.amplitude_gradient[1],int(self.n_oscillators_body/2))
             self.nominal_amplitudes[int(self.n_oscillators_body/2):self.n_oscillators_body]=self.nominal_amplitudes[0:int(self.n_oscillators_body/2)]
         
-        if self.flag=="9d1g":
-            d1=d+2*self.turning
-            R_b1=(0.196+0.065*d1)
-            R_l1=(0.131+0.131*d1)
+        if parameters.turn !=0 and parameters.turning:
+            d1=parameters.drive+parameters.turn
+            d2=parameters.drive-parameters.turn
+            R_b_1=(0.196+0.065*d1)
+            R_b_2=(0.196+0.065*d2)
             if d1<1:
-                R_l1=0 
-                R_b1=0
-            if d1>3:
-                R_l1=0
+                R_b_1=0
             if d1>5:
-                R_b1=0
-            self.nominal_amplitudes[self.n_oscillators_body//2:self.n_oscillators_body]=R_b1
-            
-            
-        if self.flag=="9d1s":
-            d1=d
-            R_b1=(0.196+0.065*d1)
-            R_l1=(0.131+0.131*d1)
-            if d1<1:
-                R_l1=0
-                R_b1=0
-            if d1>3:
-                R_l1=0
-            if d1>5:
-                R_b1=0
-            self.nominal_amplitudes[self.n_oscillators_body//2:self.n_oscillators_body]=R_b1
-            
+                R_b_1=0
+            if d2<1:
+                R_b_2=0
+            if d2>5:
+                R_b_2=0      
+            print(R_b_1,R_b_2,parameters.turn)
+            self.nominal_amplitudes=np.ones(self.n_oscillators) 
+            self.nominal_amplitudes[0:self.n_oscillators_body//2]=R_b_1
+            self.nominal_amplitudes[self.n_oscillators_body//2:self.n_oscillators_body]=R_b_2
+            self.nominal_amplitudes[self.n_oscillators_body:self.n_oscillators]=R_l

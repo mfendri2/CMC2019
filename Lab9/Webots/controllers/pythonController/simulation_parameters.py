@@ -15,15 +15,17 @@ class SimulationParameters(dict):
         self.simulation_duration = 30
         self.phase_lag = 2*math.pi
         self.amplitude_gradient = [0.3,0.3]
-        self.drive=4
         self.flag="example"
         self.back=False
         self.turn=0
         self.amplitude=0
         self.leg_body=math.pi
+        self.turning=False
         # Feel free to add more parameters (ex: MLR drive)
         #self.drive_mlr = ...
         # ...
         # Update object with provided keyword arguments
         self.update(kwargs)  # NOTE: This overrides the previous declarations
-
+    def set_drive(self,drive):
+        self.drive=drive
+        

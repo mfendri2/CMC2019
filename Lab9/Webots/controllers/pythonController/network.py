@@ -23,12 +23,6 @@ def network_ode(_time, state, parameters):
     
     amplitudes_dot=parameters.rates*(parameters.nominal_amplitudes-amplitudes)
    
-    if abs(_time-4)<=0.0001  and parameters.flag == "9d1":
-        print("turn on")
-        parameters.turn(True)
-    if abs(_time-6)<=0.0001 and parameters.flag=="9d1":
-        parameters.turn(False)
-        print("turn off")
     
     return np.concatenate([phases_dot, amplitudes_dot])
 
@@ -38,6 +32,7 @@ def motor_output(phases, amplitudes):
     q=np.zeros((14)) #Magic number
     for i in range(10):
         q[i]=amplitudes[i]*(1+math.cos(phases[i]))-amplitudes[i+10]*(1+math.cos(phases[i+10]))
+        
     q[10:14]=-phases[20:24]
     for i in range(4):
         if amplitudes[i+20]==0:
@@ -127,4 +122,6 @@ class SalamanderNetwork(ODESolver):
     def get_motor_position_output(self):
         """Get motor position"""
         return motor_output(self.state.phases, self.state.amplitudes)
+    def reset_leg_phases(self):
+        self.state[20:24]=[0,0,0,0]
 

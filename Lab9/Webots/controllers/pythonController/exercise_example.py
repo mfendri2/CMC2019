@@ -12,15 +12,13 @@ def exercise_example(world, timestep, reset):
     parameter_set = [
         SimulationParameters(
             simulation_duration=10,
-            drive=4,
+            drive=drive,
             #amplitudes=[1, 2, 3],
             phase_lag=2*math.pi,
             turn=0,
             # ...
         )
-        #for drive in np.linspace(1, 5, 5)
-        # for amplitudes in ...
-        # for ...
+        for drive in [4,4,4,4,2,2,2,2]
     ]
 
     # Grid search

@@ -29,7 +29,7 @@ def run_simulation(world, parameters, timestep, n_iterations, logs):
         iteration += 1
         if iteration >= n_iterations:
             break
-        salamander.step()
+        salamander.step(parameters)
 
     # Log data
     pylog.info("Logging simulation data to {}".format(logs))
